@@ -11,8 +11,11 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Toast
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import com.example.lapsfieldtool_v2.databinding.ActivityLoginBinding
 
 import com.example.lapsfieldtool_v2.R
@@ -36,6 +39,31 @@ class LoginActivity : AppCompatActivity() {
         val password = binding.password
         val login = binding.login
         val loading = binding.loading
+
+        val spinner: Spinner = findViewById(R.id.spinner)
+
+        val adapter = ArrayAdapter.createFromResource(
+            this,R.array.dropdown_options, android.R.layout.simple_spinner_dropdown_item
+        )
+
+        spinner.adapter = adapter
+
+        //Handle selection
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                val selectedItem = parent?.getItemAtPosition(position).toString()
+                Toast.makeText(applicationContext, "Selected: $selectedItem", Toast.LENGTH_SHORT).show()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                // Do nothing
+            }
+        }
 
         // Load persisted username and password from SharedPreferences
         val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
