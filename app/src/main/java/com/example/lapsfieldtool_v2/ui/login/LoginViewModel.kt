@@ -42,17 +42,6 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
     }
 
     fun login(tenantId: String,username: String, password: String) {
-        // can be launched in a separate asynchronous job
-        /*
-        val result = loginRepository.login(username, password)
-
-        if (result is Result.Success) {
-            _loginResult.value =
-                LoginResult(success = LoggedInUserView(displayName = result.data.displayName))
-        } else {
-            _loginResult.value = LoginResult(error = R.string.login_failed)
-        }
-        */
 
         authService.getToken(
             tenantId = tenantId,
@@ -98,7 +87,7 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
         )
     }
 
-    fun loginDataChanged(username: String, password: String, tenantId: String) {
+    fun loginDataChanged(tenantId: String, username: String, password: String) {
         if (!isTenantIdValid(tenantId)) {
             _loginForm.value = LoginFormState(tenantIdError = R.string.invalid_tenantid)
         } else if (!isUserNameValid(username)) {
@@ -110,15 +99,15 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
         }
     }
 
+    private fun isTenantIdValid(tenantId: String): Boolean {
+        return tenantId.matches(Regex("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))
+    }
+
     private fun isUserNameValid(username: String): Boolean {
         return username.matches(Regex("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))
     }
 
     private fun isPasswordValid(password: String): Boolean {
         return password.length > 5
-    }
-
-    private fun isTenantIdValid(tenantId: String): Boolean {
-        return tenantId.matches(Regex("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"))
     }
 }
