@@ -6,5 +6,6 @@ package com.example.lapsfieldtool_v2.ui.login
 data class LoginFormState(
     val usernameError: Int? = null,
     val passwordError: Int? = null,
+    val tenantIdError: Int? = null,
     val isDataValid: Boolean = false
 )

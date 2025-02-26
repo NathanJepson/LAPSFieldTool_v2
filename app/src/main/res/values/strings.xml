@@ -6,11 +6,12 @@
     <string name="action_sign_in">Sign in</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome !"</string>
-    <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="invalid_username">Not a valid client (or app) ID</string>
+    <string name="invalid_password">Client secret must be >5 characters</string>
+    <string name="invalid_tenantid">Not a valid tenant ID</string>
     <string name="login_failed">"Login failed"</string>
-    <string name="prompt_tenantid">"Tenant ID"</string>
-    <string name="prompt_clientid">"Client (or App) ID"</string>
+    <string name="prompttenantid">"Tenant ID"</string>
+    <string name="promptclientid">"Client (or App) ID"</string>
 
     <string-array name="dropdown_options">
         <item>ServerAd (Hybrid)</item>

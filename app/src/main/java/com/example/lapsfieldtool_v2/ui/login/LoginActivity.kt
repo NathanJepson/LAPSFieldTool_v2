@@ -28,6 +28,15 @@ class LoginActivity : AppCompatActivity() {
     private val PREFS_NAME = "LoginPrefs"
     //UserName is the ClientID or AppID
     private val KEY_USERNAME = "username"
+    private val KEY_TENANT_ID = "tenant_id"
+    private val KEY_TRUST_TYPE = "trust_type"
+
+    // Mapping from dropdown options to trust type values
+    private val trustTypeMap = mapOf(
+        "ServerAd (Hybrid)" to "ServerAd",
+        "AzureAd (Cloud only)" to "AzureAd",
+        "Workplace" to "Workplace"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +46,7 @@ class LoginActivity : AppCompatActivity() {
 
         val username = binding.username
         val password = binding.password
+        val tenantId = binding.test5!!
         val login = binding.login
         val loading = binding.loading
 
@@ -48,6 +58,19 @@ class LoginActivity : AppCompatActivity() {
 
         spinner.adapter = adapter
 
+        // Load persisted values from SharedPreferences
+        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        tenantId.setText(prefs.getString(KEY_TENANT_ID, ""))
+        username.setText(prefs.getString(KEY_USERNAME, ""))
+
+        val savedTrustTypePosition = prefs.getInt(KEY_TRUST_TYPE, 0)
+        if (savedTrustTypePosition < spinner.adapter.count) {
+            spinner.setSelection(savedTrustTypePosition)
+        }
+
+        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
+            .get(LoginViewModel::class.java)
+
         //Handle selection
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
@@ -57,17 +80,19 @@ class LoginActivity : AppCompatActivity() {
                 id: Long
             ) {
                 val selectedItem = parent?.getItemAtPosition(position).toString()
-                Toast.makeText(applicationContext, "Selected: $selectedItem", Toast.LENGTH_SHORT).show()
-            }
+                with(prefs.edit()) {
+                    putInt(KEY_TRUST_TYPE, position)
+                    apply()
+                }
+
+                // Get the trust type value from the map
+                val trustType = trustTypeMap[selectedItem] ?: "ServerAd" // Default to ServerAd
+                loginViewModel.setTrustType(trustType)            }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
                 // Do nothing
             }
         }
-
-        // Load persisted username and password from SharedPreferences
-        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        username.setText(prefs.getString(KEY_USERNAME, ""))
 
         loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
             .get(LoginViewModel::class.java)
@@ -84,6 +109,9 @@ class LoginActivity : AppCompatActivity() {
             if (loginState.passwordError != null) {
                 password.error = getString(loginState.passwordError)
             }
+            if (loginState.tenantIdError != null) {
+                tenantId.error = getString(loginState.tenantIdError)
+            }
         })
 
         loginViewModel.loginResult.observe(this@LoginActivity, Observer {
@@ -94,9 +122,10 @@ class LoginActivity : AppCompatActivity() {
                 showLoginFailed(loginResult.error)
             }
             if (loginResult.success != null) {
-                // Save the entered username for future auto-fill
+                // Save the entered tenant ID and client ID for future auto-fill
                 val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
                 with (prefs.edit()) {
+                    putString(KEY_TENANT_ID, tenantId.text.toString())
                     putString(KEY_USERNAME, username.text.toString())
                     apply() // Asynchronously saves the data
                 }
@@ -109,8 +138,17 @@ class LoginActivity : AppCompatActivity() {
             finish()
         })
 
+        tenantId.afterTextChanged {
+            loginViewModel.loginDataChanged(
+                tenantId.text.toString(),
+                username.text.toString(),
+                password.text.toString()
+            )
+        }
+
         username.afterTextChanged {
             loginViewModel.loginDataChanged(
+                tenantId.text.toString(),
                 username.text.toString(),
                 password.text.toString()
             )
@@ -119,6 +157,7 @@ class LoginActivity : AppCompatActivity() {
         password.apply {
             afterTextChanged {
                 loginViewModel.loginDataChanged(
+                    tenantId.text.toString(),
                     username.text.toString(),
                     password.text.toString()
                 )
@@ -128,6 +167,7 @@ class LoginActivity : AppCompatActivity() {
                 when (actionId) {
                     EditorInfo.IME_ACTION_DONE ->
                         loginViewModel.login(
+                            tenantId.text.toString(),
                             username.text.toString(),
                             password.text.toString()
                         )
@@ -137,7 +177,7 @@ class LoginActivity : AppCompatActivity() {
 
             login.setOnClickListener {
                 loading.visibility = View.VISIBLE
-                loginViewModel.login(username.text.toString(), password.text.toString())
+                loginViewModel.login(tenantId.text.toString(),username.text.toString(), password.text.toString())
             }
         }
     }
