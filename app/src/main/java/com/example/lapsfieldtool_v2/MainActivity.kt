@@ -46,7 +46,8 @@ class MainActivity : AppCompatActivity() {
         tokenManager = TokenManager.getInstance(applicationContext)
 
         val intentDeviceList: ArrayList<Device>? = intent.getParcelableArrayListExtra<Device>("device_list", Device::class.java)
-        intentDeviceList?.sortBy { it.displayName }
+        //Case insensitive sort
+        intentDeviceList?.sortBy { it.displayName.lowercase() }
 
         // Condition to check if array is empty or bearer token is expired
         var tokenExpired = false
