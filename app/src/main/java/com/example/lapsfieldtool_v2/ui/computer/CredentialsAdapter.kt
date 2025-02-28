@@ -1,5 +1,6 @@
 package com.example.lapsfieldtool_v2.ui.computer
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +27,7 @@ class CredentialsAdapter : RecyclerView.Adapter<CredentialsAdapter.CredentialVie
     }
 
     override fun onBindViewHolder(holder: CredentialViewHolder, position: Int) {
+        Log.d("CredentialsAdapter", "Successfully binding credentials to recycler view.")
         holder.bind(credentials[position])
     }
 

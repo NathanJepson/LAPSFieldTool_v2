@@ -159,6 +159,16 @@ class ComputerActivity : AppCompatActivity() {
 
                         fullscreenContent.text = "${deviceCredentials.deviceName}\n$lastBackupDate\n$refreshDate"
 
+                        // Add this to confirm the adapter is being updated and to check the data
+                        val credentialsCount = deviceCredentials.credentials.size
+                        if (credentialsCount > 0) {
+                            // Debug log or Toast to check if credentials are available
+                            Toast.makeText(this@ComputerActivity, "Found $credentialsCount credentials", Toast.LENGTH_SHORT).show()
+                        } else {
+                            // If no credentials available
+                            Toast.makeText(this@ComputerActivity, "No credentials available for this device", Toast.LENGTH_SHORT).show()
+                        }
+
                         // Update the adapter with the credentials
                         credentialsAdapter.updateCredentials(deviceCredentials.credentials)
                     },

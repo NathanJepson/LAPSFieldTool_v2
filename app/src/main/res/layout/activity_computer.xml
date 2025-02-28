@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,33 +8,35 @@
     tools:context=".ui.computer.ComputerActivity"
     android:orientation="vertical">
 
-    <!-- The primary full-screen view. This can be replaced with whatever view
-         is needed to present your content, e.g. VideoView, SurfaceView,
-         TextureView, etc. -->
-
+    <!-- The header with device information -->
     <TextView
         android:id="@+id/fullscreenContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:keepScreenOn="true"
-        android:padding="16dp"
+        android:paddingTop="48dp"
+        android:paddingBottom="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         android:text="@string/loading_device_credentials"
         android:textColor="#FFFFFF"
         android:textSize="24sp"
         android:textStyle="bold" />
 
+    <!-- The RecyclerView for credentials -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/credentialsRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:padding="8dp" />
 
+    <!-- The bottom button bar -->
     <LinearLayout
         android:id="@+id/fullscreenContentControls"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
         android:background="@color/black_overlay"
         android:orientation="horizontal"
         android:padding="16dp">
@@ -45,7 +47,5 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/back" />
-
     </LinearLayout>
-
-</FrameLayout>
+</LinearLayout>
