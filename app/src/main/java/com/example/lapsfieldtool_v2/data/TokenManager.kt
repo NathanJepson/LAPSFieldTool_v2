@@ -112,7 +112,9 @@ class TokenManager (context: Context) {
     // Save the bearer token securely
     suspend fun saveToken(token: String, expiresIn: Int) {
         val (encryptedToken, iv) = encryptToken(token)
+
         val expirationTime = System.currentTimeMillis() + (expiresIn * 1000) // Convert seconds to milliseconds
+
         dataStore.edit { preferences ->
             preferences[ENCRYPTED_TOKEN_KEY] = encryptedToken
             preferences[IV_KEY] = iv

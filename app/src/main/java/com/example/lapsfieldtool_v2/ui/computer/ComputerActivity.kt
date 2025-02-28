@@ -2,6 +2,7 @@ package com.example.lapsfieldtool_v2.ui.computer
 
 import androidx.appcompat.app.AppCompatActivity
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -19,6 +20,7 @@ import com.example.lapsfieldtool_v2.data.TokenManager
 import com.example.lapsfieldtool_v2.data.api.DeviceCredentialsService
 import com.example.lapsfieldtool_v2.databinding.ActivityComputerBinding
 import com.example.lapsfieldtool_v2.R
+import com.example.lapsfieldtool_v2.ui.login.LoginActivity
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -157,7 +159,7 @@ class ComputerActivity : AppCompatActivity() {
                             "Next Refresh: ${deviceCredentials.refreshDateTime}"
                         }
 
-                        fullscreenContent.text = "${deviceCredentials.deviceName}\n$lastBackupDate\n$refreshDate"
+                        fullscreenContent.text = "${deviceCredentials.deviceName}\n\n$lastBackupDate\n$refreshDate"
 
                         // Add this to confirm the adapter is being updated and to check the data
                         val credentialsCount = deviceCredentials.credentials.size
@@ -178,7 +180,10 @@ class ComputerActivity : AppCompatActivity() {
                     }
                 )
             } else {
-                Toast.makeText(this@ComputerActivity, "Authentication token not found", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@ComputerActivity, "Authentication token expired.", Toast.LENGTH_SHORT).show()
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                val intent = Intent(applicationContext, LoginActivity::class.java)
+                startActivity(intent)
                 finish()
             }
         }
