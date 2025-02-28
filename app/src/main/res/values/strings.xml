@@ -23,4 +23,11 @@
     <string name="title_activity_computer">ComputerActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="loading_device_credentials">Loading device credentials...</string>
+    <string name="back">Back</string>
+    <string name="account_administrator">Account: Administrator</string>
+    <string name="sid_resource">SID: S-1-5-21-...</string>
+    <string name="backup_date">Backup Date: 2025-02-20</string>
+    <string name="base64_password">Base64 Password: AAAAA==</string>
+    <string name="password_decodedpassword">Password: DecodedPassword</string>
 </resources>

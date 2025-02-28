@@ -11,19 +11,29 @@ import android.view.View
 import android.view.WindowInsets
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.lapsfieldtool_v2.data.TokenManager
+import com.example.lapsfieldtool_v2.data.api.DeviceCredentialsService
 import com.example.lapsfieldtool_v2.databinding.ActivityComputerBinding
 import com.example.lapsfieldtool_v2.R
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
 class ComputerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityComputerBinding
     private lateinit var fullscreenContent: TextView
     private lateinit var fullscreenContentControls: LinearLayout
     private val hideHandler = Handler(Looper.myLooper()!!)
+    private lateinit var credentialsAdapter: CredentialsAdapter
+    private lateinit var credentialsRecyclerView: RecyclerView
+    private lateinit var tokenManager: TokenManager
+    private val deviceCredentialsService = DeviceCredentialsService()
 
     @SuppressLint("InlinedApi")
     private val hidePart2Runnable = Runnable {
@@ -31,9 +41,6 @@ class ComputerActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= 30) {
             fullscreenContent.windowInsetsController?.hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
         } else {
-            // Note that some of these constants are new as of API 16 (Jelly Bean)
-            // and API 19 (KitKat). It is safe to use them, as they are inlined
-            // at compile-time and do nothing on earlier devices.
             fullscreenContent.systemUiVisibility =
                 View.SYSTEM_UI_FLAG_LOW_PROFILE or
                         View.SYSTEM_UI_FLAG_FULLSCREEN or
@@ -43,11 +50,13 @@ class ComputerActivity : AppCompatActivity() {
                         View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
         }
     }
+
     private val showPart2Runnable = Runnable {
         // Delayed display of UI elements
         supportActionBar?.show()
         fullscreenContentControls.visibility = View.VISIBLE
     }
+
     private var isFullscreen: Boolean = false
 
     private val hideRunnable = Runnable { hide() }
@@ -62,7 +71,6 @@ class ComputerActivity : AppCompatActivity() {
             MotionEvent.ACTION_DOWN -> if (AUTO_HIDE) {
                 delayedHide(AUTO_HIDE_DELAY_MILLIS)
             }
-
             MotionEvent.ACTION_UP -> view.performClick()
             else -> {
             }
@@ -81,16 +89,89 @@ class ComputerActivity : AppCompatActivity() {
 
         isFullscreen = true
 
-        // Set up the user interaction to manually show or hide the system UI.
+        // Set up the UI elements
         fullscreenContent = binding.fullscreenContent
         fullscreenContent.setOnClickListener { toggle() }
-
         fullscreenContentControls = binding.fullscreenContentControls
+
+        // Set up the recycler view
+        credentialsRecyclerView = binding.credentialsRecyclerView
+        credentialsAdapter = CredentialsAdapter()
+        credentialsRecyclerView.layoutManager = LinearLayoutManager(this)
+        credentialsRecyclerView.adapter = credentialsAdapter
+
+        // Set up the back button
+        binding.dummyButton.setOnClickListener {
+            finish() // Return to previous activity
+        }
+
+        // Get the token manager
+        tokenManager = TokenManager.getInstance(applicationContext)
+
+        // Get device ID from intent
+        val deviceId = intent.getStringExtra("device_id")
+        val deviceName = intent.getStringExtra("device_name") ?: "Unknown Device"
+
+        fullscreenContent.text = "Loading credentials for $deviceName..."
+
+        if (deviceId != null) {
+            // Fetch the credentials
+            fetchDeviceCredentials(deviceId)
+        } else {
+            Toast.makeText(this, "No device ID provided", Toast.LENGTH_SHORT).show()
+            finish()
+        }
 
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
         binding.dummyButton.setOnTouchListener(delayHideTouchListener)
+    }
+
+    private fun fetchDeviceCredentials(deviceId: String) {
+        lifecycleScope.launch {
+            val token = tokenManager.token.firstOrNull()
+            if (token != null) {
+                deviceCredentialsService.getDeviceCredentials(
+                    deviceId = deviceId,
+                    accessToken = token,
+                    onSuccess = { deviceCredentials ->
+                        // Update UI with credentials
+                        fullscreenContent.text = "Device: ${deviceCredentials.deviceName}"
+
+                        // Format date for display
+                        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSS'Z'", Locale.US)
+                        val outputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
+
+                        val lastBackupDate = try {
+                            val date = inputFormat.parse(deviceCredentials.lastBackupDateTime)
+                            "Last Backup: ${outputFormat.format(date!!)}"
+                        } catch (e: Exception) {
+                            "Last Backup: ${deviceCredentials.lastBackupDateTime}"
+                        }
+
+                        val refreshDate = try {
+                            val date = inputFormat.parse(deviceCredentials.refreshDateTime)
+                            "Next Refresh: ${outputFormat.format(date!!)}"
+                        } catch (e: Exception) {
+                            "Next Refresh: ${deviceCredentials.refreshDateTime}"
+                        }
+
+                        fullscreenContent.text = "${deviceCredentials.deviceName}\n$lastBackupDate\n$refreshDate"
+
+                        // Update the adapter with the credentials
+                        credentialsAdapter.updateCredentials(deviceCredentials.credentials)
+                    },
+                    onError = { errorMessage ->
+                        Toast.makeText(this@ComputerActivity, errorMessage, Toast.LENGTH_LONG).show()
+                        fullscreenContent.text = "Error loading credentials"
+                    }
+                )
+            } else {
+                Toast.makeText(this@ComputerActivity, "Authentication token not found", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        }
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -137,10 +218,6 @@ class ComputerActivity : AppCompatActivity() {
         hideHandler.postDelayed(showPart2Runnable, UI_ANIMATION_DELAY.toLong())
     }
 
-    /**
-     * Schedules a call to hide() in [delayMillis], canceling any
-     * previously scheduled calls.
-     */
     private fun delayedHide(delayMillis: Int) {
         hideHandler.removeCallbacks(hideRunnable)
         hideHandler.postDelayed(hideRunnable, delayMillis.toLong())
