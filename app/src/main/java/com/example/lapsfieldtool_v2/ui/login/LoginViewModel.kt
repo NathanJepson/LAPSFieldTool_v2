@@ -13,8 +13,11 @@ import com.example.lapsfieldtool_v2.data.api.MicrosoftGraphService
 import com.example.lapsfieldtool_v2.data.model.Device
 import com.example.lapsfieldtool_v2.data.model.LoggedInUser
 import com.example.lapsfieldtool_v2.data.model.TokenResponse
+import com.example.lapsfieldtool_v2.data.TokenManager
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
-class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {
+class LoginViewModel(private val loginRepository: LoginRepository, private val tokenManager: TokenManager) : ViewModel() {
 
     private val authService = MicrosoftAuthService()
     private val graphService = MicrosoftGraphService()
@@ -61,9 +64,12 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
     }
 
     private fun storeToken(tokenResponse: TokenResponse) {
-        // Store this securely, e.g., in encrypted SharedPreferences
-        // For now, we'll just use it directly to fetch devices
-        // FIXME TODO
+        val expiresIn = tokenResponse.expiresIn
+        val token = tokenResponse.accessToken
+
+        viewModelScope.launch {
+            tokenManager.saveToken(token, expiresIn)
+        }
     }
 
     private fun fetchDevices(accessToken: String) {

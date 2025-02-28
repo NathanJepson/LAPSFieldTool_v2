@@ -2,6 +2,7 @@ package com.example.lapsfieldtool_v2.ui.login
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
@@ -16,9 +17,14 @@ import android.widget.EditText
 import android.widget.Toast
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import androidx.datastore.core.DataStore
+
+import com.example.lapsfieldtool_v2.MainActivity
+import com.example.lapsfieldtool_v2.data.TokenManager
 import com.example.lapsfieldtool_v2.databinding.ActivityLoginBinding
 
 import com.example.lapsfieldtool_v2.R
+
 
 class LoginActivity : AppCompatActivity() {
 
@@ -68,7 +74,7 @@ class LoginActivity : AppCompatActivity() {
             spinner.setSelection(savedTrustTypePosition)
         }
 
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
+        loginViewModel = ViewModelProvider(this, LoginViewModelFactory(application))
             .get(LoginViewModel::class.java)
 
         //Handle selection
@@ -94,7 +100,7 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
+        loginViewModel = ViewModelProvider(this, LoginViewModelFactory(application))
             .get(LoginViewModel::class.java)
 
         loginViewModel.loginFormState.observe(this@LoginActivity, Observer {
@@ -135,7 +141,15 @@ class LoginActivity : AppCompatActivity() {
             setResult(Activity.RESULT_OK)
 
             //Complete and destroy login activity once successful
-            finish()
+            loginViewModel.devices.observe(this) { devices ->
+                if (devices.isNotEmpty() && (loginResult.success != null)) {
+                    val deviceList = ArrayList(devices)
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.putParcelableArrayListExtra("device_list",deviceList)
+                    startActivity(intent)
+                    finish()
+                }
+            }
         })
 
         tenantId.afterTextChanged {
@@ -195,6 +209,10 @@ class LoginActivity : AppCompatActivity() {
 
     private fun showLoginFailed(@StringRes errorString: Int) {
         Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun storeBearerToken(context: Context, token: String) {
+
     }
 }
 
