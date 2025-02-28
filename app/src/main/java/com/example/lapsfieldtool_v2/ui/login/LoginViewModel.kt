@@ -4,9 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import android.util.Patterns
-import com.example.lapsfieldtool_v2.data.LoginRepository
-import com.example.lapsfieldtool_v2.data.Result
-
 import com.example.lapsfieldtool_v2.R
 import com.example.lapsfieldtool_v2.data.api.MicrosoftAuthService
 import com.example.lapsfieldtool_v2.data.api.MicrosoftGraphService
@@ -17,7 +14,7 @@ import com.example.lapsfieldtool_v2.data.TokenManager
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
-class LoginViewModel(private val loginRepository: LoginRepository, private val tokenManager: TokenManager) : ViewModel() {
+class LoginViewModel(private val tokenManager: TokenManager) : ViewModel() {
 
     private val authService = MicrosoftAuthService()
     private val graphService = MicrosoftGraphService()

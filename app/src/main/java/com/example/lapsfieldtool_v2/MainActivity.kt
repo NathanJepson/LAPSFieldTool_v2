@@ -47,15 +47,15 @@ class MainActivity : AppCompatActivity() {
 //            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this@MainActivity)
 //            adapter = searchAdapter
 //        }
-
+        /*
         tokenManager = TokenManager(application)
+        */
+
+        tokenManager = TokenManager.getInstance(applicationContext)
 
         // Example condition to check if array is empty or bearer token is expired
 
         val intentDeviceList: ArrayList<Device>? = intent.getParcelableArrayListExtra<Device>("device_list", Device::class.java)
-        if (intentDeviceList != null) {
-            deviceList = intentDeviceList
-        }
 
         var tokenExpired = false
 
@@ -68,73 +68,78 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        if (true) {
-            deviceList.add(Device("123","Test1"))
-            deviceList.add(Device("4","YY"))
-            deviceList.add(Device("5","UU"))
-            deviceList.add(Device("6","Test2"))
-            deviceList.add(Device("7","Test3"))
-            deviceList.add(Device("8","Test4"))
-            deviceList.add(Device("9","Bet"))
-            deviceList.add(Device("10","Yuuuup"))
-            deviceList.add(Device("11","Noooooo"))
-            deviceList.add(Device("12","Algore"))
-            deviceList.add(Device("13","Gump"))
-            deviceList.add(Device("14","Forest"))
-            deviceList.add(Device("15","Jim"))
-            deviceList.add(Device("16","Nate"))
-            deviceList.add(Device("17","Device30895"))
-            deviceList.add(Device("18","RRRRRR"))
-            deviceList.add(Device("19","SSSSSS"))
-            deviceList.add(Device("20","TTTTTT"))
-            deviceList.add(Device("21","HHHHHHH"))
-            deviceList.add(Device("22","aaaaaaaaaaaaaa"))
-            deviceList.add(Device("23","bbbbbbbbbbbbb"))
-            deviceList.add(Device("24","cccccccccccc"))
-            deviceList.add(Device("25","ddddddddddddd"))
-            deviceList.add(Device("26","eeeeeeeeeeeee"))
-            deviceList.add(Device("27","ffffffffffff"))
-            deviceList.add(Device("28","gggggggggggg"))
-            deviceList.add(Device("29","hhhhhhhhhhhh"))
-            deviceList.add(Device("30","iiiiiiiiiiiii"))
-            deviceList.add(Device("31","e6"))
-            deviceList.add(Device("32","e7"))
-            deviceList.add(Device("33","e8"))
-            deviceList.add(Device("34","e9"))
-            deviceList.add(Device("35","e10"))
-            deviceList.add(Device("36","e11"))
-            deviceList.add(Device("37","e12"))
-            deviceList.add(Device("38","e13"))
-            deviceList.add(Device("39","e14"))
-            deviceList.add(Device("40","e15"))
-            deviceList.add(Device("41","e16"))
-            deviceList.add(Device("42","e17"))
-            deviceList.add(Device("43","e18"))
-            deviceList.add(Device("44","e19"))
-            deviceList.add(Device("45","e20"))
-            deviceList.add(Device("46","e21"))
-            deviceList.add(Device("47","e22"))
-            deviceList.add(Device("48","e23"))
-
-            searchAdapter.updateDevices(deviceList)
-            Log.d("MainActivity", "Device list size: ${deviceList.size}")
-        }
+//        if (true) {
+//            deviceList.add(Device("123","Test1"))
+//            deviceList.add(Device("4","YY"))
+//            deviceList.add(Device("5","UU"))
+//            deviceList.add(Device("6","Test2"))
+//            deviceList.add(Device("7","Test3"))
+//            deviceList.add(Device("8","Test4"))
+//            deviceList.add(Device("9","Bet"))
+//            deviceList.add(Device("10","Yuuuup"))
+//            deviceList.add(Device("11","Noooooo"))
+//            deviceList.add(Device("12","Algore"))
+//            deviceList.add(Device("13","Gump"))
+//            deviceList.add(Device("14","Forest"))
+//            deviceList.add(Device("15","Jim"))
+//            deviceList.add(Device("16","Nate"))
+//            deviceList.add(Device("17","Device30895"))
+//            deviceList.add(Device("18","RRRRRR"))
+//            deviceList.add(Device("19","SSSSSS"))
+//            deviceList.add(Device("20","TTTTTT"))
+//            deviceList.add(Device("21","HHHHHHH"))
+//            deviceList.add(Device("22","aaaaaaaaaaaaaa"))
+//            deviceList.add(Device("23","bbbbbbbbbbbbb"))
+//            deviceList.add(Device("24","cccccccccccc"))
+//            deviceList.add(Device("25","ddddddddddddd"))
+//            deviceList.add(Device("26","eeeeeeeeeeeee"))
+//            deviceList.add(Device("27","ffffffffffff"))
+//            deviceList.add(Device("28","gggggggggggg"))
+//            deviceList.add(Device("29","hhhhhhhhhhhh"))
+//            deviceList.add(Device("30","iiiiiiiiiiiii"))
+//            deviceList.add(Device("31","e6"))
+//            deviceList.add(Device("32","e7"))
+//            deviceList.add(Device("33","e8"))
+//            deviceList.add(Device("34","e9"))
+//            deviceList.add(Device("35","e10"))
+//            deviceList.add(Device("36","e11"))
+//            deviceList.add(Device("37","e12"))
+//            deviceList.add(Device("38","e13"))
+//            deviceList.add(Device("39","e14"))
+//            deviceList.add(Device("40","e15"))
+//            deviceList.add(Device("41","e16"))
+//            deviceList.add(Device("42","e17"))
+//            deviceList.add(Device("43","e18"))
+//            deviceList.add(Device("44","e19"))
+//            deviceList.add(Device("45","e20"))
+//            deviceList.add(Device("46","e21"))
+//            deviceList.add(Device("47","e22"))
+//            deviceList.add(Device("48","e23"))
+//
+//            searchAdapter.updateDevices(deviceList)
+//            Log.d("MainActivity", "Device list size: ${deviceList.size}")
+//        }
 
         // If no devices or bearer token expired, start LoginActivity
-       else if (tokenExpired) {
-            if (!deviceList.isNullOrEmpty()) {
+       if (tokenExpired) {
+            if (!intentDeviceList.isNullOrEmpty()) {
                 Toast.makeText(applicationContext, "Token has expired.", Toast.LENGTH_SHORT).show()
             }
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             finish()
             return
-        } else if ( (deviceList != null && deviceList.isEmpty()) || (deviceList == null)) {
+        } else if ( (intentDeviceList != null && intentDeviceList.isEmpty()) || (intentDeviceList == null)) {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             finish()
             return
         }
+
+        deviceList = intentDeviceList
+
+        searchAdapter.updateDevices(deviceList)
+        Log.d("MainActivity", "Device list size: ${deviceList.size}")
 
         searchBar?.addTextChangedListener(object : android.text.TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}

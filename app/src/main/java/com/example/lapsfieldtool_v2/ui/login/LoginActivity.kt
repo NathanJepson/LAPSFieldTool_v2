@@ -17,12 +17,9 @@ import android.widget.EditText
 import android.widget.Toast
 import android.widget.ArrayAdapter
 import android.widget.Spinner
-import androidx.datastore.core.DataStore
-
 import com.example.lapsfieldtool_v2.MainActivity
 import com.example.lapsfieldtool_v2.data.TokenManager
 import com.example.lapsfieldtool_v2.databinding.ActivityLoginBinding
-
 import com.example.lapsfieldtool_v2.R
 
 
@@ -99,9 +96,6 @@ class LoginActivity : AppCompatActivity() {
                 // Do nothing
             }
         }
-
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory(application))
-            .get(LoginViewModel::class.java)
 
         loginViewModel.loginFormState.observe(this@LoginActivity, Observer {
             val loginState = it ?: return@Observer
@@ -199,7 +193,6 @@ class LoginActivity : AppCompatActivity() {
     private fun updateUiWithUser(model: LoggedInUserView) {
         val welcome = getString(R.string.welcome)
         val displayName = model.displayName
-        // TODO : initiate successful logged in experience
         Toast.makeText(
             applicationContext,
             "$welcome $displayName",

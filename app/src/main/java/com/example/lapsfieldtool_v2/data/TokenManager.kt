@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import kotlinx.coroutines.flow.Flow
@@ -18,9 +19,15 @@ import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import java.security.SecureRandom
 
-class TokenManager(private val context: Context) {
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "token_preferences")
+
+class TokenManager (context: Context) {
+
+    private val appContext: Context = context.applicationContext
+    private val dataStore: DataStore<Preferences> = appContext.dataStore
 
     companion object {
+
         private const val STORE_NAME = "token_preferences"
         private val EXPIRATION_KEY = stringPreferencesKey("token_expiration")
         private val ENCRYPTED_TOKEN_KEY = stringPreferencesKey("encrypted_token")
@@ -28,16 +35,25 @@ class TokenManager(private val context: Context) {
         private const val ALGORITHM = "AES/GCM/NoPadding"
         private const val KEY_SIZE = 256
         private const val TAG_LENGTH = 128
+
+        @Volatile
+        private var INSTANCE: TokenManager? = null
+
+        fun getInstance(context: Context): TokenManager {
+            return INSTANCE ?: synchronized(this) {
+                INSTANCE ?: TokenManager(context.applicationContext).also { INSTANCE = it }
+            }
+        }
     }
 
-    // Create DataStore
-    private val dataStore: DataStore<Preferences> = PreferenceDataStoreFactory.create(
-        produceFile = { context.preferencesDataStoreFile(STORE_NAME) }
-    )
+//    // Create DataStore
+//    private val dataStore: DataStore<Preferences> = PreferenceDataStoreFactory.create(
+//        produceFile = { context.preferencesDataStoreFile(STORE_NAME) }
+//    )
 
     // Get or generate encryption key
     private fun getEncryptionKey(): SecretKey {
-        val sharedPrefs = context.getSharedPreferences("key_prefs", Context.MODE_PRIVATE)
+        val sharedPrefs = appContext.getSharedPreferences("key_prefs", Context.MODE_PRIVATE)
         val keyString = sharedPrefs.getString("encryption_key", null)
 
         return if (keyString != null) {
