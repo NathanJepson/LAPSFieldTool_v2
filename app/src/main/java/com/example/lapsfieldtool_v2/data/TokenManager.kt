@@ -6,8 +6,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.datastore.preferences.preferencesDataStoreFile
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -45,11 +43,6 @@ class TokenManager (context: Context) {
             }
         }
     }
-
-//    // Create DataStore
-//    private val dataStore: DataStore<Preferences> = PreferenceDataStoreFactory.create(
-//        produceFile = { context.preferencesDataStoreFile(STORE_NAME) }
-//    )
 
     // Get or generate encryption key
     private fun getEncryptionKey(): SecretKey {

@@ -24,9 +24,6 @@ class SearchViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View
     }
 
     override fun onClick(v: View?) {
-        //extras.putString("device_name", deviceName.text.toString())
-        //extras.putString("device_id",deviceId)
-
         val intent = Intent(itemView.context, ComputerActivity::class.java).apply {
             putExtra("device_name", deviceName.text.toString())
             putExtra("device_id",deviceId)
