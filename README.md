@@ -1,10 +1,15 @@
 # LAPSFieldTool_v2
 This is an Android app utilizing the Microsoft Graph API to retrieve LAPS (Local Administrator Password Solution) passwords stored in Entra ID.
 
+VirusTotal link: https://www.virustotal.com/gui/file/2d7d2b61be063ea9cd6c9675588781bbeb8048be4789eaa0bee5ce1393a3f549/details
+
 Prerequisites:
+Phone running Android 15 (I'm sorry.)
+
 1. You will need to set up an app in Entra ID and give it these 2 permissions:
-Device.Read.All
-DeviceLocalCredential.Read.All
+
+	Device.Read.All
+	DeviceLocalCredential.Read.All
 
 2. Then, you will need to take note of the "client ID" and the "tenant ID" which should be accessible on the app info page accessible via the ApplicationMenuBlade in Entra ID.
 
