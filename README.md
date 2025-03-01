@@ -9,6 +9,7 @@ Phone running Android 15 (I'm sorry.)
 1. You will need to set up an app in Entra ID and give it these 2 permissions:
 
 	Device.Read.All
+	
 	DeviceLocalCredential.Read.All
 
 2. Then, you will need to take note of the "client ID" and the "tenant ID" which should be accessible on the app info page accessible via the ApplicationMenuBlade in Entra ID.
