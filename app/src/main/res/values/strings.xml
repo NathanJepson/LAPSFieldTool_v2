@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">LAPSFieldTool_V2</string>
+    <string name="app_name">LAPSFieldTool</string>
     <string name="main_label">Device Selection</string>
     <string name="title_activity_login">Please Login to Entra ID App</string>
     <string name="prompt_email">Email</string>
